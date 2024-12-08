@@ -1,0 +1,60 @@
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+    <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
+    <id>io.github.oscar0812.APKStudio</id>
+
+    <!-- Public plugin name should be written in Title Case.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
+    <name>APKStudio</name>
+
+    <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
+    <vendor email="support@yourcompany.com" url="https://www.yourcompany.com">YourCompany</vendor>
+
+    <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
+         Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
+    <description><![CDATA[
+    Enter short description for your plugin here.<br>
+    <em>most HTML tags may be used</em>
+  ]]></description>
+
+    <!-- Product and plugin compatibility requirements.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
+    <depends>com.intellij.modules.platform</depends>
+
+    <!-- Extension points defined by the plugin.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
+    <extensions defaultExtensionNs="com.intellij">
+        <fileEditorProvider implementation="io.github.oscar0812.apkstudio.apk.ApkFileEditorProvider"/>
+
+    </extensions>
+
+    <actions>
+        <group
+                id="io.github.oscar0812.apkstudio.GroupedActions"
+                text="ApkStudio"
+                popup="true">
+            <add-to-group
+                    group-id="ProjectViewPopupMenu"
+                    anchor="after"
+                    relative-to-action="EditSource"/>
+            <action
+                    class="io.github.oscar0812.apkstudio.java2smali.ConvertJavaToSmali"
+                    id="io.github.oscar0812.apkstudio.java2smali.ConvertJavaToSmali"
+                    text="Convert Java To Smali"
+                    description="Convert java to smali">
+            </action>
+
+            <action
+                    class="io.github.oscar0812.apkstudio.java2smali.ConvertSmaliToJava"
+                    id="io.github.oscar0812.apkstudio.java2smali.ConvertSmaliToJava"
+                    text="Convert Smali To Java"
+                    description="Convert smali to java">
+            </action>
+
+            <action id="OpenApkAction" class="io.github.oscar0812.apkstudio.apk.OpenApkAction" text="Open APK" description="Decompile APK">
+                <add-to-group group-id="FileMenu" anchor="last"/>
+            </action>
+        </group>
+    </actions>
+</idea-plugin>
