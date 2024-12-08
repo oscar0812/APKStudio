@@ -48,7 +48,6 @@ public class ApkFileEditor implements FileEditor {
     }
 
     public File decompileApk(String apkPath) throws Exception {
-        // Define the output directory for the decompiled APK
         String randomChars = System.currentTimeMillis() + new Random().ints(8, 'a', 'z' + 1)
                 .mapToObj(i -> String.valueOf((char) i)).collect(Collectors.joining());
         String outputDir = apkPath.replace(".apk", "_decompiled_" + randomChars);
@@ -63,7 +62,6 @@ public class ApkFileEditor implements FileEditor {
             throw new Exception("Failed to decompile APK: " + e.getMessage(), e);
         }
 
-        // Return the decompiled directory as a File
         return new File(outputDir);
     }
 

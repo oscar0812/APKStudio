@@ -8,6 +8,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import io.github.oscar0812.JDSX.converters.FileUtils;
+import io.github.oscar0812.apkstudio.common.OpenFileAction;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -18,9 +19,9 @@ public class ConvertJavaToSmali extends AnAction {
     @Override
     public void update(AnActionEvent e) {
         // Get the current file being edited
-        VirtualFile virtualFile = e.getData(com.intellij.openapi.actionSystem.CommonDataKeys.VIRTUAL_FILE);
-        if (virtualFile != null) {
-            String fileExtension = virtualFile.getExtension();
+        VirtualFile file = e.getData(com.intellij.openapi.actionSystem.CommonDataKeys.VIRTUAL_FILE);
+        if (file != null) {
+            String fileExtension = file.getExtension();
 
             // Disable actions based on file type
             if (!"java".equalsIgnoreCase(fileExtension)) {
