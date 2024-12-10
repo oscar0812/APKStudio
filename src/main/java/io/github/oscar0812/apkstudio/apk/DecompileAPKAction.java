@@ -15,7 +15,10 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class DecompileAPKAction extends AnAction {
@@ -42,7 +45,13 @@ public class DecompileAPKAction extends AnAction {
         }
 
         Path apkPath = Path.of(file.getPath());
+        CountDownLatch latch = new CountDownLatch(1);
+        runDecompile(project, apkPath, latch, (output) -> {
+            System.out.println("Decompilation complete, output: " + output);
+        });
+    }
 
+    public static void runDecompile(Project project, Path apkPath, CountDownLatch latch, Consumer<Path> callback) {
         ProgressManager.getInstance().run(new com.intellij.openapi.progress.Task.Modal(project, "Decompiling APK", true) {
             @Override
             public void run(ProgressIndicator indicator) {
@@ -57,18 +66,30 @@ public class DecompileAPKAction extends AnAction {
                     ReindexAction.reindexDirectory(outputDir);
 
                     indicator.stop();
+
+                    if(Objects.nonNull(callback)) {
+                        callback.accept(outputDir);
+                    }
+
+                    if(Objects.nonNull(latch)) {
+                        latch.countDown();
+                    }
+
                 } catch (Exception ex) {
                     if (indicator.isCanceled()) {
                         Messages.showInfoMessage(project, "Decompilation was canceled.", "Decompile Canceled");
                     } else {
                         Messages.showErrorDialog(project, "Failed to decompile APK: " + ex.getMessage(), "Error");
                     }
+                    if(Objects.nonNull(latch)) {
+                        latch.countDown();
+                    }
                 }
             }
         });
     }
 
-    private Path createOutputDirectory(Path apkPath) throws IOException {
+    private static Path createOutputDirectory(Path apkPath) throws IOException {
         String randomChars = System.currentTimeMillis() + new Random().ints(8, 'a', 'z' + 1)
                 .mapToObj(i -> String.valueOf((char) i)).collect(Collectors.joining());
 
@@ -84,7 +105,7 @@ public class DecompileAPKAction extends AnAction {
     }
 
 
-    private void decompileApkWithProgress(Path apkPath, Path outputDirPath, ProgressIndicator indicator) throws Exception {
+    private static void decompileApkWithProgress(Path apkPath, Path outputDirPath, ProgressIndicator indicator) throws Exception {
         PrintStream originalOut = System.out;
         PrintStream originalErr = System.err;
 
@@ -100,8 +121,10 @@ public class DecompileAPKAction extends AnAction {
 
                     // When a newline is detected, send the log to the progress indicator
                     if (b == '\n') {
-                        indicator.setText("Log: " + buffer.toString().trim());
-                        buffer.setLength(0); // Clear the buffer
+                        if(!Objects.isNull(indicator)) {
+                            indicator.setText("Log: " + buffer.toString().trim());
+                            buffer.setLength(0); // Clear the buffer
+                        }
                     }
                 }
             };
@@ -111,8 +134,10 @@ public class DecompileAPKAction extends AnAction {
             System.setErr(new PrintStream(logOutputStream));
 
             // Run Apktool decompilation
-            indicator.setText("Starting decompilation...");
-            indicator.setIndeterminate(true);
+            if(!Objects.isNull(indicator)) {
+                indicator.setText("Starting decompilation...");
+                indicator.setIndeterminate(true);
+            }
             String[] newArgs = {"d", apkPath.toString(), "-o", outputDirPath.toString(), "-f"};
             brut.apktool.Main.main(newArgs);
 
