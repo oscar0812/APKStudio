@@ -3,8 +3,6 @@ package io.github.oscar0812.apkstudio.apk;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorState;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
@@ -13,8 +11,6 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -48,7 +44,6 @@ public class ApkFileEditor implements FileEditor {
     }
 
     public File decompileApk(String apkPath) throws Exception {
-        // Define the output directory for the decompiled APK
         String randomChars = System.currentTimeMillis() + new Random().ints(8, 'a', 'z' + 1)
                 .mapToObj(i -> String.valueOf((char) i)).collect(Collectors.joining());
         String outputDir = apkPath.replace(".apk", "_decompiled_" + randomChars);
@@ -63,7 +58,6 @@ public class ApkFileEditor implements FileEditor {
             throw new Exception("Failed to decompile APK: " + e.getMessage(), e);
         }
 
-        // Return the decompiled directory as a File
         return new File(outputDir);
     }
 

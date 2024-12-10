@@ -1,1 +1,1 @@
-Intellij plugin that using APKTool and JDSXTool
+Intellij plugin that uses APKTool and JDSXTool

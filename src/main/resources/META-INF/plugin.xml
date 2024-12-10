@@ -36,24 +36,31 @@
                 popup="true">
             <add-to-group
                     group-id="ProjectViewPopupMenu"
-                    anchor="after"
+                    anchor="Before"
                     relative-to-action="EditSource"/>
             <action
                     class="io.github.oscar0812.apkstudio.java2smali.ConvertJavaToSmali"
-                    id="io.github.oscar0812.apkstudio.java2smali.ConvertJavaToSmali"
+                    id="ConvertJavaToSmali"
                     text="Convert Java To Smali"
                     description="Convert java to smali">
             </action>
 
             <action
                     class="io.github.oscar0812.apkstudio.java2smali.ConvertSmaliToJava"
-                    id="io.github.oscar0812.apkstudio.java2smali.ConvertSmaliToJava"
+                    id="ConvertSmaliToJava"
                     text="Convert Smali To Java"
                     description="Convert smali to java">
             </action>
 
-            <action id="OpenApkAction" class="io.github.oscar0812.apkstudio.apk.OpenApkAction" text="Open APK" description="Decompile APK">
-                <add-to-group group-id="FileMenu" anchor="last"/>
+            <action id="DecompileApkAction" class="io.github.oscar0812.apkstudio.apk.DecompileAPKAction" text="Decompile APK" description="Decompile APK">
+                <add-to-group group-id="FileMenu" anchor="first"/>
+            </action>
+
+            <action
+                    class="io.github.oscar0812.apkstudio.apk.BuildAPKAction"
+                    id="BuildAPK"
+                    text="Build APK"
+                    description="Build APK">
             </action>
         </group>
     </actions>

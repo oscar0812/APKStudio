@@ -8,6 +8,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import io.github.oscar0812.JDSX.converters.FileUtils;
+import io.github.oscar0812.apkstudio.common.OpenFileAction;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -24,7 +25,7 @@ public class ConvertSmaliToJava extends AnAction {
 
             // Disable actions based on file type
             if (!"smali".equalsIgnoreCase(fileExtension)) {
-                e.getPresentation().setEnabled(false);
+                e.getPresentation().setEnabledAndVisible(false);
             }
         }
     }

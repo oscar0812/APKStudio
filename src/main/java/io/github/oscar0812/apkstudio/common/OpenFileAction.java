@@ -1,4 +1,4 @@
-package io.github.oscar0812.apkstudio.java2smali;
+package io.github.oscar0812.apkstudio.common;
 
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
