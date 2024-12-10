@@ -7,15 +7,14 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.util.indexing.FileBasedIndex;
+import io.github.oscar0812.apkstudio.common.ReindexAction;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -28,7 +27,7 @@ public class DecompileAPKAction extends AnAction {
             String fileExtension = file.getExtension();
 
             if (!"apk".equalsIgnoreCase(fileExtension)) {
-                e.getPresentation().setEnabled(false);
+                e.getPresentation().setEnabledAndVisible(false);
             }
         }
     }
@@ -36,34 +35,26 @@ public class DecompileAPKAction extends AnAction {
     @Override
     public void actionPerformed(AnActionEvent e) {
         Project project = e.getProject();
-        if (project == null) {
-            Messages.showErrorDialog("No open project found", "Error");
-            return;
-        }
-
         VirtualFile file = e.getData(CommonDataKeys.VIRTUAL_FILE);
 
         if (file == null || !file.getName().endsWith(".apk")) {
             return;
         }
 
-        String apkPath = file.getPath();
+        Path apkPath = Path.of(file.getPath());
 
         ProgressManager.getInstance().run(new com.intellij.openapi.progress.Task.Modal(project, "Decompiling APK", true) {
             @Override
             public void run(ProgressIndicator indicator) {
                 try {
-                    // Step 1: Create output directory
                     indicator.setText("Creating output directory...");
-                    File outputDir = createOutputDirectory(apkPath);
+                    Path outputDir = createOutputDirectory(apkPath);
 
-                    // Step 2: Perform APK decompilation with progress updates
                     indicator.setText("Decompiling APK...");
-                    decompileApkWithProgress(apkPath, outputDir.getAbsolutePath(), indicator);
+                    decompileApkWithProgress(apkPath, outputDir, indicator);
 
-                    // Step 3: Refresh and index the project
                     indicator.setText("Refreshing and indexing project...");
-                    refreshAndIndexDirectoryWithIndicator(project, outputDir, indicator);
+                    ReindexAction.reindexDirectory(outputDir);
 
                     indicator.stop();
                 } catch (Exception ex) {
@@ -77,30 +68,23 @@ public class DecompileAPKAction extends AnAction {
         });
     }
 
-    private File createOutputDirectory(String apkPath) throws IOException {
+    private Path createOutputDirectory(Path apkPath) throws IOException {
         String randomChars = System.currentTimeMillis() + new Random().ints(8, 'a', 'z' + 1)
                 .mapToObj(i -> String.valueOf((char) i)).collect(Collectors.joining());
-        String outputDirPath = apkPath.replace(".apk", "_decompiled_" + randomChars);
 
-        File outputDir = new File(outputDirPath);
-        if (!outputDir.exists() && !outputDir.mkdirs()) {
-            throw new IOException("Failed to create output directory: " + outputDirPath);
+        Path outputDirPath = apkPath.resolveSibling(
+                apkPath.getFileName().toString().replace(".apk", "_decompiled_" + randomChars));
+
+        // Create the directory if it doesn't exist
+        if (!Files.exists(outputDirPath)) {
+            Files.createDirectories(outputDirPath);
         }
 
-        return outputDir;
+        return outputDirPath;
     }
 
-    private void refreshAndIndexDirectoryWithIndicator(Project project, File outputDir, ProgressIndicator indicator) {
-        VirtualFile virtualOutputDir = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(outputDir);
-        if (virtualOutputDir != null) {
-            // Refresh the folder
-            virtualOutputDir.refresh(true, false);
 
-            FileBasedIndex.getInstance().requestReindex(virtualOutputDir);
-        }
-    }
-
-    private void decompileApkWithProgress(String apkPath, String outputDirPath, ProgressIndicator indicator) throws Exception {
+    private void decompileApkWithProgress(Path apkPath, Path outputDirPath, ProgressIndicator indicator) throws Exception {
         PrintStream originalOut = System.out;
         PrintStream originalErr = System.err;
 
@@ -129,10 +113,11 @@ public class DecompileAPKAction extends AnAction {
             // Run Apktool decompilation
             indicator.setText("Starting decompilation...");
             indicator.setIndeterminate(true);
-            String[] newArgs = {"d", apkPath, "-o", outputDirPath, "-f"};
+            String[] newArgs = {"d", apkPath.toString(), "-o", outputDirPath.toString(), "-f"};
             brut.apktool.Main.main(newArgs);
 
         } catch (Exception e) {
+            e.printStackTrace();
             if (indicator.isCanceled()) {
                 throw new InterruptedException("Decompilation was canceled by the user.");
             } else {

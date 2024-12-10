@@ -25,7 +25,7 @@ public class ConvertJavaToSmali extends AnAction {
 
             // Disable actions based on file type
             if (!"java".equalsIgnoreCase(fileExtension)) {
-                e.getPresentation().setEnabled(false);
+                e.getPresentation().setEnabledAndVisible(false);
             }
         }
     }

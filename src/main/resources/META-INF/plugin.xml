@@ -55,6 +55,13 @@
             <action id="DecompileApkAction" class="io.github.oscar0812.apkstudio.apk.DecompileAPKAction" text="Decompile APK" description="Decompile APK">
                 <add-to-group group-id="FileMenu" anchor="first"/>
             </action>
+
+            <action
+                    class="io.github.oscar0812.apkstudio.apk.BuildAPKAction"
+                    id="BuildAPK"
+                    text="Build APK"
+                    description="Build APK">
+            </action>
         </group>
     </actions>
 </idea-plugin>
