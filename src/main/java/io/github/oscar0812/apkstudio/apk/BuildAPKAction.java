@@ -1,27 +1,33 @@
 package io.github.oscar0812.apkstudio.apk;
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import io.github.oscar0812.apkstudio.common.ReindexAction;
+import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
-import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
-public class BuildAPKAction extends AnAction {
+public class BuildAPKAction extends AnAction implements DumbAware {
+
+    @NotNull
+    @Override
+    public ActionUpdateThread getActionUpdateThread() {
+        // Since the update logic is lightweight, run it on the EDT.
+        return ActionUpdateThread.BGT;
+    }
 
     @Override
     public void update(AnActionEvent e) {
@@ -58,7 +64,7 @@ public class BuildAPKAction extends AnAction {
                 try {
 
                     indicator.setText("Building APK...");
-                    buildApkWithProgress(apkYamlPath, indicator);
+                    buildAPKWithProgress(apkYamlPath, indicator);
 
                     indicator.setText("Refreshing and indexing dist...");
                     Path distPath = apkYamlPath.getParent().resolve("dist");
@@ -88,7 +94,7 @@ public class BuildAPKAction extends AnAction {
         });
     }
 
-    private static void buildApkWithProgress(Path apkYamlPath, ProgressIndicator indicator) throws Exception {
+    private static void buildAPKWithProgress(Path apkYamlPath, ProgressIndicator indicator) throws Exception {
         PrintStream originalOut = System.out;
         PrintStream originalErr = System.err;
 
