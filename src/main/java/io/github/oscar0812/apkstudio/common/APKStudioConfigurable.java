@@ -1,6 +1,5 @@
 package io.github.oscar0812.apkstudio.common;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.Configurable;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
@@ -11,12 +10,12 @@ import java.awt.*;
 public class APKStudioConfigurable implements Configurable {
 
     private static APKStudioSettings settings;
-    private JCheckBox forceBCheckBox;
-    private JCheckBox forceDCheckBox;
-    private JTextField outputDirBField;
-    private JTextField outputDirDField;
-    private JCheckBox noResourcesCheckBox;
-    private JCheckBox noSourcesCheckBox;
+    private JCheckBox forceBuildCheckBox;
+    private JCheckBox forceDecodeCheckBox;
+    private JTextField buildOutputDirTextField;
+    private JTextField decodeOutputDirTextField;
+    private JCheckBox decodeNoResourcesCheckBox;
+    private JCheckBox decodeNoSourcesCheckBox;
 
     private APKStudioSettings getSettings() {
         return APKStudioSettings.getInstance();
@@ -29,82 +28,90 @@ public class APKStudioConfigurable implements Configurable {
 
     @Override
     public @Nullable JComponent createComponent() {
-
-        forceBCheckBox = new JCheckBox("Force Build", getSettings().isForceB());
-        forceDCheckBox = new JCheckBox("Force Decode", getSettings().isForceD());
-        outputDirBField = new JTextField(getSettings().getOutputDirB());
-        outputDirDField = new JTextField(getSettings().getOutputDirD());
-        noResourcesCheckBox = new JCheckBox("No Resources", getSettings().isNoResources());
-        noSourcesCheckBox = new JCheckBox("No Sources", getSettings().isNoSources());
-
-        int height = 4;
         JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setLayout(null);  // Set layout to null for absolute positioning
 
-        panel.add(createField("Force Build:", forceBCheckBox));
-        panel.add(Box.createVerticalStrut(height));
-        panel.add(createField("Force Decode:", forceDCheckBox));
+        int headerFontSize = 16;
+        JLabel buildTitleLabel = new JLabel("APKTool Build");
+        buildTitleLabel.setFont(new Font("SansSerif", Font.BOLD, headerFontSize));
+        buildTitleLabel.setBounds(5, 5, 200, 25);
+        panel.add(buildTitleLabel);
+
+        forceBuildCheckBox = new JCheckBox("Force Build");
+        forceBuildCheckBox.setBounds(5, 35, 200, 25);
+        panel.add(forceBuildCheckBox);
+
+        // Output Directory Label and TextField
+        JLabel buildOutputDirLabel = new JLabel("Output Directory:");
+        buildOutputDirLabel.setBounds(5, 65, 150, 25);
+        panel.add(buildOutputDirLabel);
+
+        buildOutputDirTextField = new JTextField("dist", 20);
+        buildOutputDirTextField.setBounds(160, 65, 200, 25);
+        panel.add(buildOutputDirTextField);
 
         JSeparator separator = new JSeparator();
+        separator.setBounds(5, 95, 355, 10);
         panel.add(separator);
-        panel.add(Box.createVerticalStrut(height));
 
-        panel.add(createField("Output Directory (Build):", outputDirBField));
-        panel.add(Box.createVerticalStrut(height));
-        panel.add(createField("Output Directory (Decode):", outputDirDField));
-        panel.add(Box.createVerticalStrut(height));
-        panel.add(createField("No Resources:", noResourcesCheckBox));
-        panel.add(Box.createVerticalStrut(height));
-        panel.add(createField("No Sources:", noSourcesCheckBox));
+        JLabel decodeTitleLabel = new JLabel("APKTool Decode");
+        decodeTitleLabel.setFont(new Font("SansSerif", Font.BOLD, headerFontSize));
+        decodeTitleLabel.setBounds(5, 105, 200, 25);
+        panel.add(decodeTitleLabel);
+
+        forceDecodeCheckBox = new JCheckBox("Force Decode");
+        forceDecodeCheckBox.setBounds(5, 135, 200, 25);
+        panel.add(forceDecodeCheckBox);
+
+        decodeNoResourcesCheckBox = new JCheckBox("Decode No Resources");
+        decodeNoResourcesCheckBox.setBounds(5, 165, 200, 25);
+        panel.add(decodeNoResourcesCheckBox);
+
+        decodeNoSourcesCheckBox = new JCheckBox("Decode No Sources");
+        decodeNoSourcesCheckBox.setBounds(5, 195, 200, 25);
+        panel.add(decodeNoSourcesCheckBox);
+
+        JLabel decodeOutputDirLabel = new JLabel("Output Directory:");
+        decodeOutputDirLabel.setBounds(5, 225, 150, 25);
+        panel.add(decodeOutputDirLabel);
+
+        decodeOutputDirTextField = new JTextField("decoded", 20);
+        decodeOutputDirTextField.setBounds(160, 225, 200, 25);
+        panel.add(decodeOutputDirTextField);
 
         return panel;
-    }
-
-    private JPanel createField(String labelText, JComponent component) {
-        JPanel fieldPanel = new JPanel();
-        fieldPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
-
-        if (!(component instanceof JCheckBox)) {
-            JLabel label = new JLabel(labelText);
-            label.setPreferredSize(new Dimension(180, label.getPreferredSize().height));
-            fieldPanel.add(label);
-        }
-
-        fieldPanel.add(component);
-
-        return fieldPanel;
     }
 
     @Override
     public boolean isModified() {
         APKStudioSettings settings = getSettings();
-        return forceBCheckBox.isSelected() != settings.isForceB() ||
-                forceDCheckBox.isSelected() != settings.isForceD() ||
-                !outputDirBField.getText().equals(settings.getOutputDirB()) ||
-                !outputDirDField.getText().equals(settings.getOutputDirD()) ||
-                noResourcesCheckBox.isSelected() != settings.isNoResources() ||
-                noSourcesCheckBox.isSelected() != settings.isNoSources();
+        return forceBuildCheckBox.isSelected() != settings.isForceB() ||
+                forceDecodeCheckBox.isSelected() != settings.isForceD() ||
+                !buildOutputDirTextField.getText().equals(settings.getOutputDirB()) ||
+                !decodeOutputDirTextField.getText().equals(settings.getOutputDirD()) ||
+                decodeNoResourcesCheckBox.isSelected() != settings.isNoResources() ||
+                decodeNoSourcesCheckBox.isSelected() != settings.isNoSources();
     }
 
     @Override
     public void apply() {
         APKStudioSettings settings = getSettings();
-        settings.setForceB(forceBCheckBox.isSelected());
-        settings.setForceD(forceDCheckBox.isSelected());
-        settings.setOutputDirB(outputDirBField.getText());
-        settings.setOutputDirD(outputDirDField.getText());
-        settings.setNoResources(noResourcesCheckBox.isSelected());
-        settings.setNoSources(noSourcesCheckBox.isSelected());
+        settings.setForceB(forceBuildCheckBox.isSelected());
+        settings.setForceD(forceDecodeCheckBox.isSelected());
+        settings.setOutputDirB(buildOutputDirTextField.getText());
+        settings.setOutputDirD(decodeOutputDirTextField.getText());
+        settings.setNoResources(decodeNoResourcesCheckBox.isSelected());
+        settings.setNoSources(decodeNoSourcesCheckBox.isSelected());
     }
 
     @Override
     public void reset() {
         APKStudioSettings settings = getSettings();
-        forceBCheckBox.setSelected(settings.isForceB());
-        forceDCheckBox.setSelected(settings.isForceD());
-        outputDirBField.setText(settings.getOutputDirB());
-        outputDirDField.setText(settings.getOutputDirD());
-        noResourcesCheckBox.setSelected(settings.isNoResources());
-        noSourcesCheckBox.setSelected(settings.isNoSources());
+        forceBuildCheckBox.setSelected(settings.isForceB());
+        forceDecodeCheckBox.setSelected(settings.isForceD());
+        buildOutputDirTextField.setText(settings.getOutputDirB());
+        decodeOutputDirTextField.setText(settings.getOutputDirD());
+        decodeNoResourcesCheckBox.setSelected(settings.isNoResources());
+        decodeNoSourcesCheckBox.setSelected(settings.isNoSources());
     }
 }
