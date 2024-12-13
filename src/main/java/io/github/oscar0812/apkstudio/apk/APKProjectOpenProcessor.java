@@ -13,11 +13,11 @@ import org.jetbrains.annotations.Nullable;
 import java.nio.file.Path;
 import java.util.concurrent.CountDownLatch;
 
-public class ApkProjectOpenProcessor extends ProjectOpenProcessor {
+public class APKProjectOpenProcessor extends ProjectOpenProcessor {
 
     @Override
     public boolean canOpenProject(@NotNull VirtualFile file) {
-        return file.getFileType() instanceof ApkFileType;
+        return file.getFileType() instanceof APKFileType;
     }
 
     @Override
@@ -28,8 +28,8 @@ public class ApkProjectOpenProcessor extends ProjectOpenProcessor {
         CountDownLatch latch = new CountDownLatch(1);
         final Project[] openedProject = new Project[1]; // Array to store the opened project
 
-        DecompileAPKAction.runDecompile(projectManager.getDefaultProject(), apkPath, latch, (outputDir) -> {
-            System.out.println("Decompiled APK at: " + outputDir);
+        DecodeAPKAction.runDecode(projectManager.getDefaultProject(), apkPath, latch, (outputDir) -> {
+            System.out.println("Decoded APK at: " + outputDir);
 
             VirtualFile outputVf = LocalFileSystem.getInstance().refreshAndFindFileByPath(outputDir.toString());
             if (outputVf != null) {

@@ -7,11 +7,11 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-public class ApkFileType extends LanguageFileType {
+public class APKFileType extends LanguageFileType {
 
-    public static final ApkFileType INSTANCE = new ApkFileType();
+    public static final APKFileType INSTANCE = new APKFileType();
 
-    private ApkFileType() {
+    private APKFileType() {
         // Use PlainTextLanguage as the associated language
         super(com.intellij.openapi.fileTypes.PlainTextLanguage.INSTANCE);
     }

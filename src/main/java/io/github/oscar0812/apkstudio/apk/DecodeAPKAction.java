@@ -1,14 +1,17 @@
 package io.github.oscar0812.apkstudio.apk;
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import io.github.oscar0812.apkstudio.common.ReindexAction;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -21,7 +24,14 @@ import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class DecompileAPKAction extends AnAction {
+public class DecodeAPKAction extends AnAction implements DumbAware {
+
+    @NotNull
+    @Override
+    public ActionUpdateThread getActionUpdateThread() {
+        // Since the update logic is lightweight, run it on the EDT.
+        return ActionUpdateThread.BGT;
+    }
 
     @Override
     public void update(AnActionEvent e) {
@@ -46,12 +56,12 @@ public class DecompileAPKAction extends AnAction {
 
         Path apkPath = Path.of(file.getPath());
         CountDownLatch latch = new CountDownLatch(1);
-        runDecompile(project, apkPath, latch, (output) -> {
+        runDecode(project, apkPath, latch, (output) -> {
             System.out.println("Decompilation complete, output: " + output);
         });
     }
 
-    public static void runDecompile(Project project, Path apkPath, CountDownLatch latch, Consumer<Path> callback) {
+    public static void runDecode(Project project, Path apkPath, CountDownLatch latch, Consumer<Path> callback) {
         ProgressManager.getInstance().run(new com.intellij.openapi.progress.Task.Modal(project, "Decompiling APK", true) {
             @Override
             public void run(ProgressIndicator indicator) {
@@ -60,7 +70,7 @@ public class DecompileAPKAction extends AnAction {
                     Path outputDir = createOutputDirectory(apkPath);
 
                     indicator.setText("Decompiling APK...");
-                    decompileApkWithProgress(apkPath, outputDir, indicator);
+                    decodeAPKWithProgress(apkPath, outputDir, indicator);
 
                     indicator.setText("Refreshing and indexing project...");
                     ReindexAction.reindexDirectory(outputDir);
@@ -77,9 +87,9 @@ public class DecompileAPKAction extends AnAction {
 
                 } catch (Exception ex) {
                     if (indicator.isCanceled()) {
-                        Messages.showInfoMessage(project, "Decompilation was canceled.", "Decompile Canceled");
+                        Messages.showInfoMessage(project, "Decompilation was canceled.", "Decode Canceled");
                     } else {
-                        Messages.showErrorDialog(project, "Failed to decompile APK: " + ex.getMessage(), "Error");
+                        Messages.showErrorDialog(project, "Failed to decode APK: " + ex.getMessage(), "Error");
                     }
                     if(Objects.nonNull(latch)) {
                         latch.countDown();
@@ -94,7 +104,7 @@ public class DecompileAPKAction extends AnAction {
                 .mapToObj(i -> String.valueOf((char) i)).collect(Collectors.joining());
 
         Path outputDirPath = apkPath.resolveSibling(
-                apkPath.getFileName().toString().replace(".apk", "_decompiled_" + randomChars));
+                apkPath.getFileName().toString().replace(".apk", "_decoded_" + randomChars));
 
         // Create the directory if it doesn't exist
         if (!Files.exists(outputDirPath)) {
@@ -105,7 +115,7 @@ public class DecompileAPKAction extends AnAction {
     }
 
 
-    private static void decompileApkWithProgress(Path apkPath, Path outputDirPath, ProgressIndicator indicator) throws Exception {
+    private static void decodeAPKWithProgress(Path apkPath, Path outputDirPath, ProgressIndicator indicator) throws Exception {
         PrintStream originalOut = System.out;
         PrintStream originalErr = System.err;
 
@@ -146,7 +156,7 @@ public class DecompileAPKAction extends AnAction {
             if (indicator.isCanceled()) {
                 throw new InterruptedException("Decompilation was canceled by the user.");
             } else {
-                throw new Exception("Failed to decompile APK: " + e.getMessage(), e);
+                throw new Exception("Failed to decode APK: " + e.getMessage(), e);
             }
         } finally {
             System.setOut(originalOut);

@@ -25,14 +25,19 @@
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
-        <fileTypeFactory implementation="io.github.oscar0812.apkstudio.apk.ApkFileTypeFactory" />
-        <projectOpenProcessor implementation="io.github.oscar0812.apkstudio.apk.ApkProjectOpenProcessor" />
+        <fileType name="APK File"
+                  language="TEXT"
+                  fieldName="INSTANCE"
+                  implementationClass="io.github.oscar0812.apkstudio.apk.APKFileType"
+                  extensions="apk" />
+        <projectOpenProcessor implementation="io.github.oscar0812.apkstudio.apk.APKProjectOpenProcessor" />
+        <applicationConfigurable instance="io.github.oscar0812.apkstudio.common.APKStudioConfigurable" displayName="ApkStudio Settings"/>
     </extensions>
 
     <actions>
         <group
                 id="io.github.oscar0812.apkstudio.GroupedActions"
-                text="ApkStudio"
+                text="APKStudio"
                 popup="true">
             <!-- Add actions to EditorTabPopupMenu (file tab right-click menu) -->
             <add-to-group
@@ -64,10 +69,10 @@
                     description="Build APK">
             </action>
             <action
-                    class="io.github.oscar0812.apkstudio.apk.DecompileAPKAction"
-                    id="DecompileAPK"
-                    text="Decompile APK"
-                    description="Decompile APK">
+                    class="io.github.oscar0812.apkstudio.apk.DecodeAPKAction"
+                    id="DecodeAPK"
+                    text="Decode APK"
+                    description="Decode APK">
             </action>
         </group>
     </actions>
