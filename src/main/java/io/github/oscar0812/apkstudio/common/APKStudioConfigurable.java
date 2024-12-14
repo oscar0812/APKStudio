@@ -84,33 +84,33 @@ public class APKStudioConfigurable implements Configurable {
     @Override
     public boolean isModified() {
         APKStudioSettings settings = getSettings();
-        return forceBuildCheckBox.isSelected() != settings.isForceB() ||
-                forceDecodeCheckBox.isSelected() != settings.isForceD() ||
-                !buildOutputDirTextField.getText().equals(settings.getOutputDirB()) ||
-                !decodeOutputDirTextField.getText().equals(settings.getOutputDirD()) ||
-                decodeNoResourcesCheckBox.isSelected() != settings.isNoResources() ||
-                decodeNoSourcesCheckBox.isSelected() != settings.isNoSources();
+        return forceBuildCheckBox.isSelected() != settings.isForceBuild() ||
+                forceDecodeCheckBox.isSelected() != settings.isForceDecode() ||
+                !buildOutputDirTextField.getText().equals(settings.getBuildOutputDir()) ||
+                !decodeOutputDirTextField.getText().equals(settings.getDecodeOutputDir()) ||
+                decodeNoResourcesCheckBox.isSelected() != settings.isDecodeNoResources() ||
+                decodeNoSourcesCheckBox.isSelected() != settings.isDecodeNoSources();
     }
 
     @Override
     public void apply() {
         APKStudioSettings settings = getSettings();
-        settings.setForceB(forceBuildCheckBox.isSelected());
-        settings.setForceD(forceDecodeCheckBox.isSelected());
-        settings.setOutputDirB(buildOutputDirTextField.getText());
-        settings.setOutputDirD(decodeOutputDirTextField.getText());
-        settings.setNoResources(decodeNoResourcesCheckBox.isSelected());
-        settings.setNoSources(decodeNoSourcesCheckBox.isSelected());
+        settings.setForceBuild(forceBuildCheckBox.isSelected());
+        settings.setForceDecode(forceDecodeCheckBox.isSelected());
+        settings.setBuildOutputDir(buildOutputDirTextField.getText());
+        settings.setDecodeOutputDir(decodeOutputDirTextField.getText());
+        settings.setDecodeNoResources(decodeNoResourcesCheckBox.isSelected());
+        settings.setDecodeNoSources(decodeNoSourcesCheckBox.isSelected());
     }
 
     @Override
     public void reset() {
         APKStudioSettings settings = getSettings();
-        forceBuildCheckBox.setSelected(settings.isForceB());
-        forceDecodeCheckBox.setSelected(settings.isForceD());
-        buildOutputDirTextField.setText(settings.getOutputDirB());
-        decodeOutputDirTextField.setText(settings.getOutputDirD());
-        decodeNoResourcesCheckBox.setSelected(settings.isNoResources());
-        decodeNoSourcesCheckBox.setSelected(settings.isNoSources());
+        forceBuildCheckBox.setSelected(settings.isForceBuild());
+        forceDecodeCheckBox.setSelected(settings.isForceDecode());
+        buildOutputDirTextField.setText(settings.getBuildOutputDir());
+        decodeOutputDirTextField.setText(settings.getDecodeOutputDir());
+        decodeNoResourcesCheckBox.setSelected(settings.isDecodeNoResources());
+        decodeNoSourcesCheckBox.setSelected(settings.isDecodeNoSources());
     }
 }

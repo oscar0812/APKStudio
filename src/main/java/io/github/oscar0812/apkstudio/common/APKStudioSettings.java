@@ -12,14 +12,14 @@ import org.jetbrains.annotations.NotNull;
 public final class APKStudioSettings implements PersistentStateComponent<APKStudioSettings.State> {
 
     public static class State {
-        public boolean forceB = false;
-        public boolean forceD = false;
+        public boolean forceBuild = false;
+        public boolean forceDecode = false;
 
-        public String outputDirB = "dist/name.apk";
-        public String outputDirD = "decoded";
+        public String buildOutputDir = "dist";
+        public String decodeOutputDir = "decoded";
 
-        public boolean noResources = false;
-        public boolean noSources = false;
+        public boolean decodeNoResources = false;
+        public boolean decodeNoSources = false;
     }
 
     private static APKStudioSettings instance;
@@ -33,52 +33,52 @@ public final class APKStudioSettings implements PersistentStateComponent<APKStud
 
     private State state = new State();
 
-    public boolean isForceB() {
-        return state.forceB;
+    public boolean isForceBuild() {
+        return state.forceBuild;
     }
 
-    public void setForceB(boolean forceB) {
-        state.forceB = forceB;
+    public void setForceBuild(boolean forceBuild) {
+        state.forceBuild = forceBuild;
     }
 
-    public boolean isForceD() {
-        return state.forceD;
+    public boolean isForceDecode() {
+        return state.forceDecode;
     }
 
-    public void setForceD(boolean forceD) {
-        state.forceD = forceD;
+    public void setForceDecode(boolean forceDecode) {
+        state.forceDecode = forceDecode;
     }
 
-    public String getOutputDirB() {
-        return state.outputDirB;
+    public String getBuildOutputDir() {
+        return state.buildOutputDir;
     }
 
-    public void setOutputDirB(String outputDirB) {
-        state.outputDirB = outputDirB;
+    public void setBuildOutputDir(String buildOutputDir) {
+        state.buildOutputDir = buildOutputDir;
     }
 
-    public String getOutputDirD() {
-        return state.outputDirD;
+    public String getDecodeOutputDir() {
+        return state.decodeOutputDir;
     }
 
-    public void setOutputDirD(String outputDirD) {
-        state.outputDirD = outputDirD;
+    public void setDecodeOutputDir(String decodeOutputDir) {
+        state.decodeOutputDir = decodeOutputDir;
     }
 
-    public boolean isNoResources() {
-        return state.noResources;
+    public boolean isDecodeNoResources() {
+        return state.decodeNoResources;
     }
 
-    public void setNoResources(boolean noResources) {
-        state.noResources = noResources;
+    public void setDecodeNoResources(boolean decodeNoResources) {
+        state.decodeNoResources = decodeNoResources;
     }
 
-    public boolean isNoSources() {
-        return state.noSources;
+    public boolean isDecodeNoSources() {
+        return state.decodeNoSources;
     }
 
-    public void setNoSources(boolean noSources) {
-        state.noSources = noSources;
+    public void setDecodeNoSources(boolean decodeNoSources) {
+        state.decodeNoSources = decodeNoSources;
     }
 
     @Override
