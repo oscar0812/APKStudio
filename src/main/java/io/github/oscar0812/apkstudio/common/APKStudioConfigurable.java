@@ -9,7 +9,6 @@ import java.awt.*;
 
 public class APKStudioConfigurable implements Configurable {
 
-    private static APKStudioSettings settings;
     private JCheckBox forceBuildCheckBox;
     private JCheckBox forceDecodeCheckBox;
     private JTextField buildOutputDirTextField;
